@@ -295,7 +295,7 @@
             position: absolute;
             width: 100%;
             min-height: 350px;
-            max-height: 600px;
+            max-height: 700px;
             overflow-y: auto;
             backface-visibility: hidden;
             border-radius: 20px;
@@ -307,6 +307,10 @@
             text-align: center;
             box-shadow: 0 15px 40px rgba(0,0,0,0.15);
             transition: box-shadow 0.3s, min-height 0.3s;
+        }
+
+        .flashcard-back {
+            padding: 40px 35px;
         }
 
         /* Smooth scrollbar for long content */
@@ -645,8 +649,13 @@
 
             .flashcard-front,
             .flashcard-back {
-                padding: 40px 24px;
+                padding: 30px 20px;
                 min-height: 300px;
+                max-height: 600px;
+            }
+            
+            .flashcard-back {
+                padding: 25px 18px;
             }
 
             .card-content {
@@ -763,16 +772,15 @@
                 <div class="flashcard" id="flashcard">
                     <div class="flashcard-inner" id="flashcardInner" onclick="flipCard()">
                         <div class="flashcard-front">
-                            <div class="card-label">Question</div>
+                            <div class="card-label">Driver / Pain Statement</div>
                             <div class="card-content" id="questionText"></div>
                         </div>
-                        <div class="flashcard-back">
-                            <div class="card-label">Answer</div>
-                            <div class="card-content" id="answerText"></div>
+                        <div class="flashcard-back" style="padding: 30px; overflow-y: auto; justify-content: flex-start;">
+                            <div id="answerText"></div>
                         </div>
                     </div>
                 </div>
-                <p class="hint">💡 Click the card to flip it</p>
+                <p class="hint">💡 Click the card to see the String Theory approach</p>
                 <div class="navigation">
                     <button class="nav-btn" onclick="previousCard()">⬅ Previous</button>
                     <button class="nav-btn" onclick="shuffleCards()">🔀 Shuffle</button>
@@ -944,14 +952,46 @@
             const answerEl = document.getElementById('answerText');
             
             questionEl.textContent = card.question;
-            answerEl.textContent = card.answer;
             
-            // Dynamic font sizing based on content length
+            // Parse String Theory format if it contains steps
+            if (card.answer.includes('Step 1') && card.answer.includes('→')) {
+                const steps = card.answer.split('→').map(s => s.trim());
+                
+                let html = '<div style="display: flex; flex-direction: column; gap: 20px; width: 100%; text-align: left;">';
+                
+                steps.forEach((step, idx) => {
+                    const stepNum = idx + 1;
+                    const colors = ['#4A90E2', '#9B59B6', '#10B981', '#F59E0B'];
+                    const color = colors[idx % 4];
+                    
+                    html += `
+                        <div style="background: rgba(255,255,255,0.95); border-left: 4px solid ${color}; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="color: ${color}; font-weight: 700; font-size: 0.9em; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                ${step.includes('Step') ? step.split(':')[0].split('-')[0].trim() : 'Step ' + stepNum}
+                            </div>
+                            <div style="color: #2C3E50; font-size: 1em; line-height: 1.6; font-weight: 500;">
+                                ${step.includes(':') ? step.split(':').slice(1).join(':').trim() : step}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                answerEl.innerHTML = html;
+            } else {
+                // Regular card display
+                answerEl.textContent = card.answer;
+                applyDynamicFontSize(answerEl, card.answer);
+            }
+            
+            // Dynamic font sizing for question
             applyDynamicFontSize(questionEl, card.question);
-            applyDynamicFontSize(answerEl, card.answer);
             
-            // Adjust card height based on content
-            adjustCardHeight(card.question, card.answer);
+            // Adjust card height
+            const flashcardFront = document.querySelector('.flashcard-front');
+            const flashcardBack = document.querySelector('.flashcard-back');
+            flashcardBack.style.minHeight = '500px';
+            flashcardBack.style.maxHeight = '700px';
             
             // Reset flip
             document.getElementById('flashcardInner').classList.remove('flipped');
