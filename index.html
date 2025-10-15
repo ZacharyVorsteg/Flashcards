@@ -28,8 +28,15 @@
         }
 
         html {
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             overflow-anchor: none;
+        }
+
+        html.no-scroll,
+        body.no-scroll {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
 
         body::before {
@@ -360,10 +367,10 @@
             margin: 20px auto;
             max-width: 850px;
             width: 100%;
+            height: 550px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 580px;
+            align-items: center;
         }
 
         .flashcard-inner {
@@ -943,20 +950,20 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
-            <div id="studyMode">
+            <div id="studyMode" style="min-height: 700px;">
                 <div class="flashcard" id="flashcard">
                     <div class="flashcard-inner" id="flashcardInner" onclick="flipCard()">
                         <div class="flashcard-front">
                             <div class="card-label">Driver / Pain Statement</div>
                             <div class="card-content" id="questionText"></div>
                         </div>
-                        <div class="flashcard-back" style="padding: 30px; overflow-y: auto; justify-content: flex-start;">
-                            <div id="answerText"></div>
+                        <div class="flashcard-back">
+                            <div id="answerText" style="width: 100%; height: 100%; overflow-y: auto; display: flex; align-items: center; justify-content: center;"></div>
                         </div>
                     </div>
                 </div>
-                <p class="hint">💡 Click the card to see the String Theory approach</p>
-                <div class="navigation">
+                <p class="hint" style="height: 30px; display: flex; align-items: center; justify-content: center;">💡 Click the card to see the String Theory approach</p>
+                <div class="navigation" style="height: 60px;">
                     <button class="nav-btn" onclick="previousCard()">⬅ Previous</button>
                     <button class="nav-btn" onclick="shuffleCards()">🔀 Shuffle</button>
                     <button class="nav-btn" onclick="nextCard()">Next ➡</button>
@@ -1140,7 +1147,7 @@
                 ];
                 const colors = ['#BB0000', '#666666', '#8B7355', '#C1A57B'];
                 
-                let html = '<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 680px; margin: 0 auto; padding: 0;">';
+                let html = '<div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 650px; margin: 0 auto; padding: 5px; height: 100%; justify-content: center;">';
                 
                 steps.forEach((step, idx) => {
                     const stepInfo = stepTitles[idx] || { title: `Step ${idx + 1}`, subtitle: '' };
@@ -1234,20 +1241,25 @@
             // Prevent double-flipping
             if (flashcardInner.classList.contains('flipping')) return;
             
-            // Lock scroll position
+            // Lock scroll position and prevent scrolling during flip
             const scrollY = window.scrollY;
+            const scrollX = window.scrollX;
+            
+            document.documentElement.classList.add('no-scroll');
+            document.body.classList.add('no-scroll');
+            document.body.style.top = `-${scrollY}px`;
             
             flashcardInner.classList.add('flipping');
             flashcardInner.classList.toggle('flipped');
             
-            // Restore scroll position to prevent jump
-            window.scrollTo(0, scrollY);
-            
-            // Re-enable after animation completes
+            // Re-enable scrolling after animation completes
             setTimeout(() => {
                 flashcardInner.classList.remove('flipping');
-                window.scrollTo(0, scrollY);
-            }, 600);
+                document.documentElement.classList.remove('no-scroll');
+                document.body.classList.remove('no-scroll');
+                document.body.style.top = '';
+                window.scrollTo(scrollX, scrollY);
+            }, 650);
         }
 
         function nextCard() {
