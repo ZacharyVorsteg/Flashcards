@@ -942,8 +942,12 @@
                 <div class="stat-value" id="studiedCards">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Score</div>
-                <div class="stat-value" id="score">0%</div>
+                <div class="stat-label">❤️ Favorites</div>
+                <div class="stat-value" id="favCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Need Work</div>
+                <div class="stat-value" id="dislikeCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Streak 🔥</div>
@@ -1004,7 +1008,17 @@
                         </div>
                     </div>
                 </div>
+                <div style="display: flex; gap: 12px; justify-content: center; margin: 20px 0 15px;">
+                    <button id="favBtn" onclick="toggleFavorite()" style="padding: 10px 24px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-family: inherit; font-size: 0.95em; transition: all 0.3s; box-shadow: 0 3px 8px rgba(0,0,0,0.2);">🤍 Favorite</button>
+                    <button id="dislikeBtn" onclick="toggleDislike()" style="padding: 10px 24px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-family: inherit; font-size: 0.95em; transition: all 0.3s; box-shadow: 0 3px 8px rgba(0,0,0,0.2);">👎 Dislike</button>
+                </div>
                 <p class="hint">💡 Click the card to see the String Theory approach</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button onclick="setFilter('all')" id="filterAll" style="padding: 8px 20px; border: 2px solid #BB0000; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #BB0000; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">All Cards</button>
+                    <button onclick="setFilter('favorites')" id="filterFav" style="padding: 8px 20px; border: 2px solid #10b981; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #10b981; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">❤️ Favorites</button>
+                    <button onclick="setFilter('dislikes')" id="filterDislike" style="padding: 8px 20px; border: 2px solid #EF4444; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #EF4444; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">❌ Need Work</button>
+                    <button onclick="setFilter('unrated')" id="filterUnrated" style="padding: 8px 20px; border: 2px solid #6B7280; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #6B7280; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">Unrated</button>
+                </div>
                 <div class="navigation">
                     <button class="nav-btn" onclick="previousCard()">⬅ Previous</button>
                     <button class="nav-btn" onclick="shuffleCards()">🔀 Shuffle</button>
@@ -1062,6 +1076,10 @@
         let quizAnswered = 0;
         let currentStreak = 0;
         let usedIndices = new Set();
+        let favorites = new Set();
+        let dislikes = new Set();
+        let currentFilter = 'all'; // 'all', 'favorites', 'dislikes', 'unrated'
+        let currentDeckName = '';
 
         // Pre-loaded flashcard decks
         const DECKS = {
@@ -1072,6 +1090,7 @@
         // Load deck function
         async function loadDeck(deckName) {
             try {
+                currentDeckName = deckName;
                 let response;
                 if (deckName === 'modmed') {
                     response = await fetch('modmed-sales-flashcards.txt');
@@ -1081,9 +1100,77 @@
                 
                 const text = await response.text();
                 parseTextFile(text);
+                loadPreferences();
             } catch (error) {
                 console.error('Error loading deck:', error);
                 alert('Error loading flashcards. Please try uploading a file instead.');
+            }
+        }
+
+        // Load/Save preferences
+        function loadPreferences() {
+            const key = `flashcards_${currentDeckName}`;
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                const data = JSON.parse(saved);
+                favorites = new Set(data.favorites || []);
+                dislikes = new Set(data.dislikes || []);
+            }
+        }
+
+        function savePreferences() {
+            const key = `flashcards_${currentDeckName}`;
+            const data = {
+                favorites: Array.from(favorites),
+                dislikes: Array.from(dislikes)
+            };
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function toggleFavorite() {
+            const cardKey = currentIndex;
+            if (favorites.has(cardKey)) {
+                favorites.delete(cardKey);
+            } else {
+                favorites.add(cardKey);
+                dislikes.delete(cardKey); // Remove from dislikes if there
+            }
+            savePreferences();
+            updateCardButtons();
+        }
+
+        function toggleDislike() {
+            const cardKey = currentIndex;
+            if (dislikes.has(cardKey)) {
+                dislikes.delete(cardKey);
+            } else {
+                dislikes.add(cardKey);
+                favorites.delete(cardKey); // Remove from favorites if there
+            }
+            savePreferences();
+            updateCardButtons();
+        }
+
+        function updateCardButtons() {
+            const favBtn = document.getElementById('favBtn');
+            const dislikeBtn = document.getElementById('dislikeBtn');
+            
+            if (favBtn && dislikeBtn) {
+                if (favorites.has(currentIndex)) {
+                    favBtn.innerHTML = '❤️ Favorited';
+                    favBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                } else {
+                    favBtn.innerHTML = '🤍 Favorite';
+                    favBtn.style.background = 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)';
+                }
+                
+                if (dislikes.has(currentIndex)) {
+                    dislikeBtn.innerHTML = '❌ Disliked';
+                    dislikeBtn.style.background = 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)';
+                } else {
+                    dislikeBtn.innerHTML = '👎 Dislike';
+                    dislikeBtn.style.background = 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)';
+                }
             }
         }
 
@@ -1239,6 +1326,7 @@
             
             studiedCards.add(currentIndex);
             updateStats();
+            updateCardButtons();
         }
 
         function applyDynamicFontSize(element, text) {
@@ -1281,20 +1369,61 @@
             flashcardInner.classList.toggle('flipped');
         }
 
+        function setFilter(filter) {
+            currentFilter = filter;
+            usedIndices.clear();
+            
+            // Update button styles
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.style.background = 'white';
+            });
+            
+            const activeBtn = document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1));
+            if (activeBtn) {
+                const color = activeBtn.style.color;
+                activeBtn.style.background = color;
+                activeBtn.style.color = 'white';
+            }
+            
+            // Start with first card in filtered set
+            const filteredIndices = getFilteredIndices();
+            if (filteredIndices.length > 0) {
+                usedIndices.add(filteredIndices[0]);
+                showCard(filteredIndices[0]);
+            } else {
+                alert(`No cards in this category yet!`);
+            }
+        }
+
+        function getFilteredIndices() {
+            let indices = [];
+            for (let i = 0; i < flashcards.length; i++) {
+                if (currentFilter === 'all') {
+                    indices.push(i);
+                } else if (currentFilter === 'favorites' && favorites.has(i)) {
+                    indices.push(i);
+                } else if (currentFilter === 'dislikes' && dislikes.has(i)) {
+                    indices.push(i);
+                } else if (currentFilter === 'unrated' && !favorites.has(i) && !dislikes.has(i)) {
+                    indices.push(i);
+                }
+            }
+            return indices;
+        }
+
         function nextCard() {
             if (currentMode === 'study') {
-                if (usedIndices.size >= flashcards.length) {
+                const filteredIndices = getFilteredIndices();
+                const availableIndices = filteredIndices.filter(i => !usedIndices.has(i));
+                
+                if (availableIndices.length === 0) {
                     showCompletionScreen();
                     return;
                 }
                 
-                let nextIndex;
-                do {
-                    nextIndex = Math.floor(Math.random() * flashcards.length);
-                } while (usedIndices.has(nextIndex));
-                
-                usedIndices.add(nextIndex);
-                showCard(nextIndex);
+                const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+                usedIndices.add(randomIndex);
+                showCard(randomIndex);
             }
         }
 
@@ -1480,22 +1609,17 @@
         }
 
         function updateStats() {
-            document.getElementById('totalCards').textContent = flashcards.length;
+            const filteredIndices = getFilteredIndices();
+            const totalShowing = currentFilter === 'all' ? flashcards.length : filteredIndices.length;
+            
+            document.getElementById('totalCards').textContent = totalShowing;
             document.getElementById('studiedCards').textContent = usedIndices.size;
-            
-            if (currentMode === 'quiz' && quizAnswered > 0) {
-                const percentage = Math.round((quizScore / quizAnswered) * 100);
-                document.getElementById('score').textContent = percentage + '%';
-            } else {
-                const percentage = flashcards.length > 0 ? 
-                    Math.round((usedIndices.size / flashcards.length) * 100) : 0;
-                document.getElementById('score').textContent = percentage + '%';
-            }
-            
+            document.getElementById('favCount').textContent = favorites.size;
+            document.getElementById('dislikeCount').textContent = dislikes.size;
             document.getElementById('streak').textContent = currentStreak;
 
-            const progress = flashcards.length > 0 ? 
-                (usedIndices.size / flashcards.length) * 100 : 0;
+            const progress = totalShowing > 0 ? 
+                (usedIndices.size / totalShowing) * 100 : 0;
             document.getElementById('progressFill').style.width = progress + '%';
         }
 
