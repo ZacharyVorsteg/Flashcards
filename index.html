@@ -377,24 +377,25 @@
         .flashcard-front,
         .flashcard-back {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 550px;
-            overflow-y: hidden;
+            overflow-y: auto;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
             border-radius: 20px;
-            padding: 50px 40px;
+            padding: 40px 35px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-            transition: none;
         }
 
         .flashcard-back {
-            padding: 20px 30px;
+            padding: 25px 30px;
             justify-content: flex-start;
         }
 
@@ -1313,45 +1314,88 @@
 
             const card = flashcards[questionIndex];
             const quizQuestionEl = document.getElementById('quizQuestion');
-            quizQuestionEl.textContent = card.question;
             
-            // Apply dynamic font sizing to quiz question
-            applyDynamicFontSize(quizQuestionEl, card.question);
-
-            const options = [card.answer];
-            const wrongIndices = new Set([questionIndex]);
-
-            while (options.length < Math.min(4, flashcards.length)) {
-                const randomIndex = Math.floor(Math.random() * flashcards.length);
-                if (!wrongIndices.has(randomIndex)) {
-                    options.push(flashcards[randomIndex].answer);
-                    wrongIndices.add(randomIndex);
+            // For String Theory cards, just show the scenario name for quiz
+            if (card.answer.includes('Step 1') && card.answer.includes('→')) {
+                quizQuestionEl.textContent = card.question + ' - What\'s the first step?';
+                
+                // Create simplified options - just the CONFIRM statements
+                const options = [];
+                const wrongIndices = new Set([questionIndex]);
+                
+                // Get correct CONFIRM
+                const confirmMatch = card.answer.match(/CONFIRM:\s*"([^"]+)"/);
+                const correctAnswer = confirmMatch ? confirmMatch[1] : card.answer.split('→')[0].split(':')[1].trim();
+                options.push(correctAnswer);
+                
+                // Get wrong CONFIRM statements from other cards
+                while (options.length < Math.min(4, flashcards.length)) {
+                    const randomIndex = Math.floor(Math.random() * flashcards.length);
+                    if (!wrongIndices.has(randomIndex)) {
+                        const wrongCard = flashcards[randomIndex];
+                        if (wrongCard.answer.includes('CONFIRM:')) {
+                            const wrongMatch = wrongCard.answer.match(/CONFIRM:\s*"([^"]+)"/);
+                            if (wrongMatch && !options.includes(wrongMatch[1])) {
+                                options.push(wrongMatch[1]);
+                                wrongIndices.add(randomIndex);
+                            }
+                        }
+                    }
                 }
+                
+                options.sort(() => Math.random() - 0.5);
+                
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = '';
+                
+                options.forEach(option => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'quiz-option';
+                    optionDiv.textContent = option;
+                    optionDiv.style.fontSize = '1em';
+                    optionDiv.style.lineHeight = '1.5';
+                    optionDiv.onclick = () => checkAnswer(option, correctAnswer, optionDiv);
+                    optionsContainer.appendChild(optionDiv);
+                });
+                
+            } else {
+                // Regular cards
+                quizQuestionEl.textContent = card.question;
+                applyDynamicFontSize(quizQuestionEl, card.question);
+
+                const options = [card.answer];
+                const wrongIndices = new Set([questionIndex]);
+
+                while (options.length < Math.min(4, flashcards.length)) {
+                    const randomIndex = Math.floor(Math.random() * flashcards.length);
+                    if (!wrongIndices.has(randomIndex)) {
+                        options.push(flashcards[randomIndex].answer);
+                        wrongIndices.add(randomIndex);
+                    }
+                }
+
+                options.sort(() => Math.random() - 0.5);
+
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = '';
+
+                const maxOptionLength = Math.max(...options.map(opt => opt.length));
+
+                options.forEach(option => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'quiz-option';
+                    
+                    if (maxOptionLength > 100) {
+                        optionDiv.classList.add('medium-option');
+                    } else if (maxOptionLength > 200) {
+                        optionDiv.classList.add('large-option');
+                    }
+                    
+                    optionDiv.textContent = option;
+                    optionDiv.onclick = () => checkAnswer(option, card.answer, optionDiv);
+                    optionsContainer.appendChild(optionDiv);
+                });
             }
-
-            options.sort(() => Math.random() - 0.5);
-
-            const optionsContainer = document.getElementById('quizOptions');
-            optionsContainer.innerHTML = '';
-
-            // Find the longest option to determine sizing
-            const maxOptionLength = Math.max(...options.map(opt => opt.length));
-
-            options.forEach(option => {
-                const optionDiv = document.createElement('div');
-                optionDiv.className = 'quiz-option';
-                
-                // Apply dynamic sizing based on option length
-                if (maxOptionLength > 100) {
-                    optionDiv.classList.add('medium-option');
-                } else if (maxOptionLength > 200) {
-                    optionDiv.classList.add('large-option');
-                }
-                
-                optionDiv.textContent = option;
-                optionDiv.onclick = () => checkAnswer(option, card.answer, optionDiv);
-                optionsContainer.appendChild(optionDiv);
-            });
 
             document.getElementById('quizNextBtn').style.display = 'none';
         }
