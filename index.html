@@ -429,15 +429,32 @@
         }
 
         .flashcard-front {
-            background: linear-gradient(135deg, #BB0000 0%, #8B0000 100%);
+            background: #BB0000;
+            background-image: linear-gradient(135deg, #BB0000 0%, #8B0000 100%);
             color: #FFFFFF;
             border: 3px solid rgba(255, 255, 255, 0.25);
             box-shadow: 0 15px 40px rgba(187, 0, 0, 0.3), inset 0 2px 4px rgba(255,255,255,0.1);
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+            transform: rotateY(0deg);
         }
         
         .flashcard-front * {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        
+        .flashcard-front::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #8B0000;
+            opacity: 0.95;
+            z-index: -1;
+            border-radius: 18px;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
@@ -460,7 +477,8 @@
         }
 
         .flashcard-back {
-            background: linear-gradient(135deg, #666666 0%, #4D4D4D 100%);
+            background: #666666;
+            background-image: linear-gradient(135deg, #666666 0%, #4D4D4D 100%);
             color: #FFFFFF;
             transform: rotateY(180deg);
             border: 3px solid rgba(255, 255, 255, 0.25);
@@ -470,6 +488,21 @@
         }
         
         .flashcard-back * {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        
+        .flashcard-back::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #4D4D4D;
+            opacity: 0.95;
+            z-index: -1;
+            border-radius: 18px;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
