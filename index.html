@@ -1008,16 +1008,21 @@
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 12px; justify-content: center; margin: 20px 0 15px;">
-                    <button id="favBtn" onclick="toggleFavorite()" style="padding: 10px 24px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-family: inherit; font-size: 0.95em; transition: all 0.3s; box-shadow: 0 3px 8px rgba(0,0,0,0.2);">🤍 Favorite</button>
-                    <button id="dislikeBtn" onclick="toggleDislike()" style="padding: 10px 24px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-family: inherit; font-size: 0.95em; transition: all 0.3s; box-shadow: 0 3px 8px rgba(0,0,0,0.2);">👎 Dislike</button>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; margin: 20px 0;">
+                    <p style="color: white; text-align: center; font-size: 0.9em; margin-bottom: 12px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">How well do you know this card?</p>
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button id="favBtn" onclick="toggleFavorite()" style="padding: 12px 28px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-family: inherit; font-size: 1em; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">🤍 Got It!</button>
+                        <button id="dislikeBtn" onclick="toggleDislike()" style="padding: 12px 28px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: white; font-family: inherit; font-size: 1em; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">📝 Need Practice</button>
+                    </div>
                 </div>
-                <p class="hint">💡 Click the card to see the String Theory approach</p>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
-                    <button onclick="setFilter('all')" id="filterAll" style="padding: 8px 20px; border: 2px solid #BB0000; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #BB0000; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">All Cards</button>
-                    <button onclick="setFilter('favorites')" id="filterFav" style="padding: 8px 20px; border: 2px solid #10b981; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #10b981; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">❤️ Favorites</button>
-                    <button onclick="setFilter('dislikes')" id="filterDislike" style="padding: 8px 20px; border: 2px solid #EF4444; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #EF4444; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">❌ Need Work</button>
-                    <button onclick="setFilter('unrated')" id="filterUnrated" style="padding: 8px 20px; border: 2px solid #6B7280; border-radius: 8px; font-weight: 600; cursor: pointer; background: white; color: #6B7280; font-family: inherit; font-size: 0.85em; transition: all 0.3s;">Unrated</button>
+                <div style="background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; margin-bottom: 15px;">
+                    <p style="color: white; text-align: center; font-size: 0.85em; margin-bottom: 10px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">Filter Cards:</p>
+                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="setFilter('all')" id="filterAll" style="padding: 8px 18px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #BB0000; color: white; font-family: inherit; font-size: 0.85em; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">All (<span id="allCount">0</span>)</button>
+                        <button onclick="setFilter('favorites')" id="filterFav" style="padding: 8px 18px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.3); color: white; font-family: inherit; font-size: 0.85em; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">❤️ Mastered (<span id="favFilterCount">0</span>)</button>
+                        <button onclick="setFilter('dislikes')" id="filterDislike" style="padding: 8px 18px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.3); color: white; font-family: inherit; font-size: 0.85em; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">📝 Practice (<span id="dislikeFilterCount">0</span>)</button>
+                        <button onclick="setFilter('unrated')" id="filterUnrated" style="padding: 8px 18px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.3); color: white; font-family: inherit; font-size: 0.85em; transition: all 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">New (<span id="unratedCount">0</span>)</button>
+                    </div>
                 </div>
                 <div class="navigation">
                     <button class="nav-btn" onclick="previousCard()">⬅ Previous</button>
@@ -1112,10 +1117,20 @@
             const key = `flashcards_${currentDeckName}`;
             const saved = localStorage.getItem(key);
             if (saved) {
-                const data = JSON.parse(saved);
-                favorites = new Set(data.favorites || []);
-                dislikes = new Set(data.dislikes || []);
+                try {
+                    const data = JSON.parse(saved);
+                    favorites = new Set(data.favorites || []);
+                    dislikes = new Set(data.dislikes || []);
+                    console.log(`Loaded ${favorites.size} favorites and ${dislikes.size} practice cards for ${currentDeckName}`);
+                } catch (e) {
+                    favorites = new Set();
+                    dislikes = new Set();
+                }
+            } else {
+                favorites = new Set();
+                dislikes = new Set();
             }
+            updateFilterCounts();
         }
 
         function savePreferences() {
@@ -1157,20 +1172,44 @@
             
             if (favBtn && dislikeBtn) {
                 if (favorites.has(currentIndex)) {
-                    favBtn.innerHTML = '❤️ Favorited';
+                    favBtn.innerHTML = '✅ Mastered!';
                     favBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    favBtn.style.transform = 'scale(1.05)';
                 } else {
-                    favBtn.innerHTML = '🤍 Favorite';
+                    favBtn.innerHTML = '🤍 Got It!';
                     favBtn.style.background = 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)';
+                    favBtn.style.transform = 'scale(1)';
                 }
                 
                 if (dislikes.has(currentIndex)) {
-                    dislikeBtn.innerHTML = '❌ Disliked';
-                    dislikeBtn.style.background = 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)';
+                    dislikeBtn.innerHTML = '📚 Studying This';
+                    dislikeBtn.style.background = 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)';
+                    dislikeBtn.style.transform = 'scale(1.05)';
                 } else {
-                    dislikeBtn.innerHTML = '👎 Dislike';
+                    dislikeBtn.innerHTML = '📝 Need Practice';
                     dislikeBtn.style.background = 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)';
+                    dislikeBtn.style.transform = 'scale(1)';
                 }
+            }
+            
+            // Update filter counts
+            updateFilterCounts();
+        }
+
+        function updateFilterCounts() {
+            const unratedCount = flashcards.length - favorites.size - dislikes.size;
+            
+            if (document.getElementById('allCount')) {
+                document.getElementById('allCount').textContent = flashcards.length;
+            }
+            if (document.getElementById('favFilterCount')) {
+                document.getElementById('favFilterCount').textContent = favorites.size;
+            }
+            if (document.getElementById('dislikeFilterCount')) {
+                document.getElementById('dislikeFilterCount').textContent = dislikes.size;
+            }
+            if (document.getElementById('unratedCount')) {
+                document.getElementById('unratedCount').textContent = unratedCount;
             }
         }
 
@@ -1242,6 +1281,12 @@
                 return;
             }
 
+            // Set deck name if uploaded (for localStorage)
+            if (!currentDeckName) {
+                currentDeckName = 'custom';
+            }
+            
+            loadPreferences();
             startStudying();
         }
 
@@ -1373,25 +1418,34 @@
             currentFilter = filter;
             usedIndices.clear();
             
-            // Update button styles
-            document.querySelectorAll('[id^="filter"]').forEach(btn => {
-                btn.style.background = 'white';
-            });
+            // Update button styles - reset all to inactive
+            document.getElementById('filterAll').style.background = 'rgba(255,255,255,0.3)';
+            document.getElementById('filterFav').style.background = 'rgba(255,255,255,0.3)';
+            document.getElementById('filterDislike').style.background = 'rgba(255,255,255,0.3)';
+            document.getElementById('filterUnrated').style.background = 'rgba(255,255,255,0.3)';
             
-            const activeBtn = document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1));
-            if (activeBtn) {
-                const color = activeBtn.style.color;
-                activeBtn.style.background = color;
-                activeBtn.style.color = 'white';
+            // Highlight active filter
+            const filterMap = {
+                'all': { btn: 'filterAll', bg: '#BB0000' },
+                'favorites': { btn: 'filterFav', bg: '#10b981' },
+                'dislikes': { btn: 'filterDislike', bg: '#F59E0B' },
+                'unrated': { btn: 'filterUnrated', bg: '#6B7280' }
+            };
+            
+            if (filterMap[filter]) {
+                document.getElementById(filterMap[filter].btn).style.background = filterMap[filter].bg;
+                document.getElementById(filterMap[filter].btn).style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
             }
             
             // Start with first card in filtered set
             const filteredIndices = getFilteredIndices();
             if (filteredIndices.length > 0) {
-                usedIndices.add(filteredIndices[0]);
-                showCard(filteredIndices[0]);
+                const randomIndex = filteredIndices[Math.floor(Math.random() * filteredIndices.length)];
+                usedIndices.add(randomIndex);
+                showCard(randomIndex);
             } else {
-                alert(`No cards in this category yet!`);
+                alert(`No cards in this category yet! Rate some cards first.`);
+                setFilter('all');
             }
         }
 
