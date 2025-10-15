@@ -737,11 +737,6 @@
             <div class="mode-buttons">
                 <button class="mode-btn study active" onclick="setMode('study')">📖 Study Mode</button>
                 <button class="mode-btn quiz" onclick="setMode('quiz')">🎯 Quiz Mode</button>
-                <button class="mode-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="setMode('manage')">⚙️ Manage Cards</button>
-            </div>
-            
-            <div style="text-align: center; margin-bottom: 20px;">
-                <button class="nav-btn" onclick="downloadDeck()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">📥 Download Deck</button>
             </div>
 
             <div class="progress-bar">
@@ -794,17 +789,6 @@
                     <br>
                     <button class="reset-btn" onclick="resetSession()">🔄 Start New Session</button>
                 </div>
-            </div>
-
-            <div id="manageMode" style="display: none;">
-                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #f3f4f6 100%); border: 2px dashed #667eea; border-radius: 16px; padding: 30px; margin-bottom: 30px;">
-                    <h3 style="color: #667eea; margin-bottom: 20px; font-size: 1.5em;">➕ Add New Card</h3>
-                    <input type="text" id="newQuestion" placeholder="Enter question..." style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 1em; margin-bottom: 12px;">
-                    <textarea id="newAnswer" placeholder="Enter answer..." style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 1em; margin-bottom: 12px; min-height: 100px; resize: vertical;"></textarea>
-                    <button onclick="addNewCard()" style="padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: inherit; font-size: 1em;">Add Card</button>
-                </div>
-
-                <div style="max-height: 600px; overflow-y: auto;" id="cardList"></div>
             </div>
         </div>
     </div>
@@ -1005,23 +989,18 @@
             });
             event.target.classList.add('active');
 
-            // Hide all modes
-            document.getElementById('studyMode').style.display = 'none';
-            document.getElementById('quizMode').style.display = 'none';
-            document.getElementById('completionScreen').style.display = 'none';
-            document.getElementById('manageMode').style.display = 'none';
-
             if (mode === 'study') {
                 document.getElementById('studyMode').style.display = 'block';
+                document.getElementById('quizMode').style.display = 'none';
+                document.getElementById('completionScreen').style.display = 'none';
                 usedIndices.clear();
                 usedIndices.add(currentIndex);
                 showCard(currentIndex);
-            } else if (mode === 'quiz') {
+            } else {
+                document.getElementById('studyMode').style.display = 'none';
                 document.getElementById('quizMode').style.display = 'block';
+                document.getElementById('completionScreen').style.display = 'none';
                 startQuiz();
-            } else if (mode === 'manage') {
-                document.getElementById('manageMode').style.display = 'block';
-                renderCardList();
             }
         }
 
@@ -1171,122 +1150,6 @@
             }
             
             updateStats();
-        }
-
-        // Card Management Functions
-        function downloadDeck() {
-            if (flashcards.length === 0) {
-                alert('No cards to download! Please upload a deck first.');
-                return;
-            }
-
-            const textContent = flashcards.map(card => 
-                `${card.question} | ${card.answer}`
-            ).join('\n');
-
-            const blob = new Blob([textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'flashcards-' + new Date().toISOString().split('T')[0] + '.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function addNewCard() {
-            const question = document.getElementById('newQuestion').value.trim();
-            const answer = document.getElementById('newAnswer').value.trim();
-
-            if (!question || !answer) {
-                alert('Please enter both a question and an answer.');
-                return;
-            }
-
-            flashcards.push({ question, answer });
-            document.getElementById('newQuestion').value = '';
-            document.getElementById('newAnswer').value = '';
-            
-            updateStats();
-            renderCardList();
-            alert('Card added successfully!');
-        }
-
-        function renderCardList() {
-            const cardList = document.getElementById('cardList');
-            cardList.innerHTML = '';
-
-            if (flashcards.length === 0) {
-                cardList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 40px;">No cards yet. Add your first card above!</p>';
-                return;
-            }
-
-            flashcards.forEach((card, index) => {
-                const cardItem = document.createElement('div');
-                cardItem.style.cssText = 'background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 16px; padding: 20px; margin-bottom: 16px;';
-                cardItem.id = `card-${index}`;
-                
-                cardItem.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <div style="font-weight: 700; color: #667eea; font-size: 1.1em;">Card ${index + 1}</div>
-                        <div style="display: flex; gap: 10px;">
-                            <button onclick="editCard(${index})" style="padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #667eea; color: white; font-family: inherit;">Edit</button>
-                            <button onclick="deleteCard(${index})" style="padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #ef4444; color: white; font-family: inherit;">Delete</button>
-                        </div>
-                    </div>
-                    <div id="display-${index}" style="color: #1f2937; line-height: 1.6;">
-                        <strong style="color: #667eea; display: block; margin-bottom: 8px;">Q:</strong>
-                        <div style="margin-bottom: 12px;">${card.question}</div>
-                        <strong style="color: #667eea; display: block; margin-bottom: 8px;">A:</strong>
-                        <div>${card.answer}</div>
-                    </div>
-                    <div id="edit-${index}" style="display: none;">
-                        <input type="text" id="edit-q-${index}" value="${card.question.replace(/"/g, '&quot;')}" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 1em; margin-bottom: 12px;">
-                        <textarea id="edit-a-${index}" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-family: inherit; font-size: 1em; margin-bottom: 12px; min-height: 100px; resize: vertical;">${card.answer}</textarea>
-                        <div style="display: flex; gap: 10px;">
-                            <button onclick="saveCard(${index})" style="padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #10b981; color: white; font-family: inherit;">Save</button>
-                            <button onclick="cancelEdit(${index})" style="padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: #6b7280; color: white; font-family: inherit;">Cancel</button>
-                        </div>
-                    </div>
-                `;
-                
-                cardList.appendChild(cardItem);
-            });
-        }
-
-        function editCard(index) {
-            document.getElementById(`display-${index}`).style.display = 'none';
-            document.getElementById(`edit-${index}`).style.display = 'block';
-        }
-
-        function cancelEdit(index) {
-            document.getElementById(`display-${index}`).style.display = 'block';
-            document.getElementById(`edit-${index}`).style.display = 'none';
-        }
-
-        function saveCard(index) {
-            const newQuestion = document.getElementById(`edit-q-${index}`).value.trim();
-            const newAnswer = document.getElementById(`edit-a-${index}`).value.trim();
-
-            if (!newQuestion || !newAnswer) {
-                alert('Question and answer cannot be empty.');
-                return;
-            }
-
-            flashcards[index] = { question: newQuestion, answer: newAnswer };
-            updateStats();
-            renderCardList();
-            alert('Card updated successfully!');
-        }
-
-        function deleteCard(index) {
-            if (confirm(`Are you sure you want to delete Card ${index + 1}?`)) {
-                flashcards.splice(index, 1);
-                updateStats();
-                renderCardList();
-                alert('Card deleted successfully!');
-            }
         }
     </script>
 </body>
