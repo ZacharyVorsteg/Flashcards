@@ -277,11 +277,12 @@
             padding: 50px 40px;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.9);
-            min-height: 500px;
+            min-height: 800px;
             display: none;
             backdrop-filter: blur(10px);
             border: 3px solid rgba(187, 0, 0, 0.2);
             position: relative;
+            contain: layout;
         }
 
         .card-section::before {
@@ -364,13 +365,15 @@
 
         .flashcard {
             perspective: 1500px;
-            margin: 20px auto;
+            margin: 0 auto;
             max-width: 850px;
             width: 100%;
             height: 550px;
             display: flex;
             justify-content: center;
             align-items: center;
+            contain: layout style paint;
+            will-change: contents;
         }
 
         .flashcard-inner {
@@ -540,9 +543,10 @@
             gap: 16px;
             justify-content: center;
             align-items: center;
-            margin: 40px auto 0;
+            margin: 15px auto 0;
             flex-wrap: wrap;
             max-width: 850px;
+            min-height: 60px;
         }
 
         .nav-btn {
@@ -770,11 +774,15 @@
         .hint {
             font-size: 0.95em;
             color: rgba(255, 255, 255, 0.8);
-            margin-top: 24px;
+            margin: 15px 0;
             font-style: italic;
             font-weight: 500;
             text-align: center;
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         @media (max-width: 768px) {
@@ -950,8 +958,8 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
-            <div id="studyMode" style="min-height: 700px;">
-                <div class="flashcard" id="flashcard">
+            <div id="studyMode" style="height: 700px; display: flex; flex-direction: column; justify-content: flex-start;">
+                <div class="flashcard" id="flashcard" style="position: relative;">
                     <div class="flashcard-inner" id="flashcardInner" onclick="flipCard()">
                         <div class="flashcard-front">
                             <div class="card-label">Driver / Pain Statement</div>
@@ -962,8 +970,8 @@
                         </div>
                     </div>
                 </div>
-                <p class="hint" style="height: 30px; display: flex; align-items: center; justify-content: center;">💡 Click the card to see the String Theory approach</p>
-                <div class="navigation" style="height: 60px;">
+                <p class="hint">💡 Click the card to see the String Theory approach</p>
+                <div class="navigation">
                     <button class="nav-btn" onclick="previousCard()">⬅ Previous</button>
                     <button class="nav-btn" onclick="shuffleCards()">🔀 Shuffle</button>
                     <button class="nav-btn" onclick="nextCard()">Next ➡</button>
@@ -1241,23 +1249,36 @@
             // Prevent double-flipping
             if (flashcardInner.classList.contains('flipping')) return;
             
-            // Lock scroll position and prevent scrolling during flip
-            const scrollY = window.scrollY;
-            const scrollX = window.scrollX;
+            // Aggressive scroll prevention
+            const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
             
-            document.documentElement.classList.add('no-scroll');
-            document.body.classList.add('no-scroll');
+            // Lock page completely
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.position = 'fixed';
+            document.body.style.position = 'fixed';
             document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = `-${scrollX}px`;
+            document.body.style.right = '0';
+            document.body.style.width = '100%';
             
-            flashcardInner.classList.add('flipping');
-            flashcardInner.classList.toggle('flipped');
+            requestAnimationFrame(() => {
+                flashcardInner.classList.add('flipping');
+                flashcardInner.classList.toggle('flipped');
+            });
             
-            // Re-enable scrolling after animation completes
+            // Unlock after animation
             setTimeout(() => {
                 flashcardInner.classList.remove('flipping');
-                document.documentElement.classList.remove('no-scroll');
-                document.body.classList.remove('no-scroll');
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+                document.documentElement.style.position = '';
+                document.body.style.position = '';
                 document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.width = '';
                 window.scrollTo(scrollX, scrollY);
             }, 650);
         }
