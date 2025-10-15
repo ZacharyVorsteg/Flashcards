@@ -270,7 +270,8 @@
         .flashcard {
             perspective: 1500px;
             margin: 40px auto;
-            max-width: 700px;
+            max-width: 800px;
+            width: 100%;
         }
 
         .flashcard-inner {
@@ -291,6 +292,8 @@
             position: absolute;
             width: 100%;
             min-height: 350px;
+            max-height: 600px;
+            overflow-y: auto;
             backface-visibility: hidden;
             border-radius: 20px;
             padding: 50px 40px;
@@ -300,7 +303,30 @@
             align-items: center;
             text-align: center;
             box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-            transition: box-shadow 0.3s;
+            transition: box-shadow 0.3s, min-height 0.3s;
+        }
+
+        /* Smooth scrollbar for long content */
+        .flashcard-front::-webkit-scrollbar,
+        .flashcard-back::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .flashcard-front::-webkit-scrollbar-track,
+        .flashcard-back::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .flashcard-front::-webkit-scrollbar-thumb,
+        .flashcard-back::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .flashcard-front::-webkit-scrollbar-thumb:hover,
+        .flashcard-back::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
 
         .flashcard-inner:hover .flashcard-front,
@@ -324,6 +350,29 @@
             line-height: 1.5;
             font-weight: 600;
             word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+            transition: font-size 0.3s ease;
+        }
+
+        /* Dynamic font sizing based on content length */
+        .card-content.small-text {
+            font-size: 1.75em;
+        }
+
+        .card-content.medium-text {
+            font-size: 1.4em;
+        }
+
+        .card-content.large-text {
+            font-size: 1.1em;
+        }
+
+        .card-content.xlarge-text {
+            font-size: 0.95em;
+            line-height: 1.6;
         }
 
         .card-label {
@@ -333,6 +382,7 @@
             text-transform: uppercase;
             letter-spacing: 0.15em;
             font-weight: 700;
+            flex-shrink: 0;
         }
 
         .navigation {
@@ -377,7 +427,7 @@
             display: grid;
             gap: 16px;
             margin-top: 40px;
-            max-width: 700px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -394,6 +444,21 @@
             text-align: left;
             position: relative;
             overflow: hidden;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            line-height: 1.5;
+        }
+
+        /* Dynamic sizing for quiz options */
+        .quiz-option.medium-option {
+            font-size: 1em;
+        }
+
+        .quiz-option.large-option {
+            font-size: 0.9em;
+            padding: 20px 24px;
         }
 
         .quiz-option::before {
@@ -575,12 +640,28 @@
 
             .flashcard-front,
             .flashcard-back {
-                padding: 40px 28px;
+                padding: 40px 24px;
                 min-height: 300px;
             }
 
             .card-content {
                 font-size: 1.4em;
+            }
+
+            .card-content.small-text {
+                font-size: 1.4em;
+            }
+
+            .card-content.medium-text {
+                font-size: 1.2em;
+            }
+
+            .card-content.large-text {
+                font-size: 1em;
+            }
+
+            .card-content.xlarge-text {
+                font-size: 0.85em;
             }
 
             .celebration h2 {
@@ -589,6 +670,20 @@
 
             .stats-bar {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quiz-option {
+                font-size: 1em;
+                padding: 20px 24px;
+            }
+
+            .quiz-option.medium-option {
+                font-size: 0.9em;
+            }
+
+            .quiz-option.large-option {
+                font-size: 0.8em;
+                padding: 18px 20px;
             }
         }
     </style>
@@ -794,14 +889,59 @@
             currentIndex = index;
             const card = flashcards[currentIndex];
             
-            document.getElementById('questionText').textContent = card.question;
-            document.getElementById('answerText').textContent = card.answer;
+            const questionEl = document.getElementById('questionText');
+            const answerEl = document.getElementById('answerText');
+            
+            questionEl.textContent = card.question;
+            answerEl.textContent = card.answer;
+            
+            // Dynamic font sizing based on content length
+            applyDynamicFontSize(questionEl, card.question);
+            applyDynamicFontSize(answerEl, card.answer);
+            
+            // Adjust card height based on content
+            adjustCardHeight(card.question, card.answer);
             
             // Reset flip
             document.getElementById('flashcardInner').classList.remove('flipped');
             
             studiedCards.add(currentIndex);
             updateStats();
+        }
+
+        function applyDynamicFontSize(element, text) {
+            // Remove existing size classes
+            element.classList.remove('small-text', 'medium-text', 'large-text', 'xlarge-text');
+            
+            const length = text.length;
+            
+            if (length < 50) {
+                element.classList.add('small-text');
+            } else if (length < 150) {
+                element.classList.add('medium-text');
+            } else if (length < 300) {
+                element.classList.add('large-text');
+            } else {
+                element.classList.add('xlarge-text');
+            }
+        }
+
+        function adjustCardHeight(question, answer) {
+            const flashcardFront = document.querySelector('.flashcard-front');
+            const flashcardBack = document.querySelector('.flashcard-back');
+            
+            // Calculate appropriate height based on content
+            const maxLength = Math.max(question.length, answer.length);
+            
+            let minHeight = '350px';
+            if (maxLength > 300) {
+                minHeight = '450px';
+            } else if (maxLength > 500) {
+                minHeight = '550px';
+            }
+            
+            flashcardFront.style.minHeight = minHeight;
+            flashcardBack.style.minHeight = minHeight;
         }
 
         function flipCard() {
@@ -888,7 +1028,11 @@
             currentIndex = questionIndex;
 
             const card = flashcards[questionIndex];
-            document.getElementById('quizQuestion').textContent = card.question;
+            const quizQuestionEl = document.getElementById('quizQuestion');
+            quizQuestionEl.textContent = card.question;
+            
+            // Apply dynamic font sizing to quiz question
+            applyDynamicFontSize(quizQuestionEl, card.question);
 
             const options = [card.answer];
             const wrongIndices = new Set([questionIndex]);
@@ -906,9 +1050,20 @@
             const optionsContainer = document.getElementById('quizOptions');
             optionsContainer.innerHTML = '';
 
+            // Find the longest option to determine sizing
+            const maxOptionLength = Math.max(...options.map(opt => opt.length));
+
             options.forEach(option => {
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'quiz-option';
+                
+                // Apply dynamic sizing based on option length
+                if (maxOptionLength > 100) {
+                    optionDiv.classList.add('medium-option');
+                } else if (maxOptionLength > 200) {
+                    optionDiv.classList.add('large-option');
+                }
+                
                 optionDiv.textContent = option;
                 optionDiv.onclick = () => checkAnswer(option, card.answer, optionDiv);
                 optionsContainer.appendChild(optionDiv);

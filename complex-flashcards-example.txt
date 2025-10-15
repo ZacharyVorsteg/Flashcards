@@ -1,0 +1,41 @@
+What is photosynthesis? | Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods from carbon dioxide and water. It generally involves the green pigment chlorophyll and generates oxygen as a byproduct.
+
+Define the Renaissance period | The Renaissance was a fervent period of European cultural, artistic, political and economic rebirth following the Middle Ages, spanning from the 14th to the 17th century. It promoted the rediscovery of classical philosophy, literature and art, and emphasized humanism over religious dogma.
+
+What is quantum entanglement? | Quantum entanglement is a physical phenomenon that occurs when a pair or group of particles is generated, interact, or share spatial proximity in a way such that the quantum state of each particle of the pair or group cannot be described independently of the state of the others, including when the particles are separated by a large distance.
+
+Capital of Japan | Tokyo
+
+What is DNA? | Deoxyribonucleic acid (DNA) is a molecule composed of two polynucleotide chains that coil around each other to form a double helix carrying genetic instructions for the development, functioning, growth and reproduction of all known organisms and many viruses. DNA and ribonucleic acid (RNA) are nucleic acids.
+
+Who wrote "1984"? | George Orwell
+
+Explain the theory of relativity | Einstein's theory of relativity is actually comprised of two theories: special relativity and general relativity. Special relativity introduced the concept that space and time are interwoven into a single continuum known as space-time, and that the laws of physics are the same for all non-accelerating observers. General relativity extended this to include gravity as a geometric property of space and time, or space-time. This theory explains that massive objects cause a distortion in space-time, which is felt as gravity.
+
+What is the Pythagorean theorem? | In mathematics, the Pythagorean theorem states that in a right-angled triangle, the square of the length of the hypotenuse (the side opposite the right angle) is equal to the sum of the squares of the lengths of the other two sides. This can be written as: a² + b² = c²
+
+Define mitochondria | Mitochondria are membrane-bound cell organelles that generate most of the chemical energy needed to power the cell's biochemical reactions. Chemical energy produced by the mitochondria is stored in a small molecule called adenosine triphosphate (ATP). Often called the "powerhouse of the cell," mitochondria have their own DNA and can replicate independently of the cell.
+
+2 + 2 = ? | 4
+
+What caused World War I? | World War I was caused by a complex web of factors including militarism, alliances, imperialism, and nationalism. The immediate trigger was the assassination of Archduke Franz Ferdinand of Austria-Hungary in Sarajevo on June 28, 1914, by Gavrilo Princip, a Bosnian Serb nationalist. However, underlying tensions between European powers, arms races, colonial competition, and a system of entangling alliances created a powder keg situation where a regional conflict quickly escalated into a global war involving most of the world's great powers.
+
+What is machine learning? | Machine learning is a subset of artificial intelligence that provides systems the ability to automatically learn and improve from experience without being explicitly programmed. It focuses on the development of computer programs that can access data and use it to learn for themselves through pattern recognition and computational algorithms.
+
+Define homeostasis | Homeostasis is the tendency of organisms to auto-regulate and maintain their internal environment in a stable state. The stable condition is maintained by multiple regulatory mechanisms that include feedback mechanisms.
+
+What is Shakespeare's most famous play? | Hamlet (though "Romeo and Juliet" and "Macbeth" are also extremely famous)
+
+Explain blockchain technology | Blockchain is a distributed ledger technology that maintains a continuously growing list of records, called blocks, which are linked and secured using cryptography. Each block contains a cryptographic hash of the previous block, a timestamp, and transaction data. By design, blockchains are inherently resistant to modification of the data. Once recorded, the data in any given block cannot be altered retroactively without the alteration of all subsequent blocks, which requires consensus of the network majority.
+
+What is the capital of France? | Paris
+
+Define cognitive dissonance | Cognitive dissonance is the mental discomfort experienced by a person who holds two or more contradictory beliefs, ideas, or values at the same time, or is confronted by new information that conflicts with existing beliefs, ideas, or values. This discomfort is triggered by a situation in which a person's belief clashes with new evidence perceived by the person.
+
+What is E=mc²? | E=mc² is Einstein's famous equation from special relativity that establishes the relationship between energy (E) and mass (m), with c representing the speed of light in a vacuum. It demonstrates that mass and energy are interchangeable; they are different forms of the same thing. A small amount of mass can be converted into a huge amount of energy, which is the principle behind nuclear power and atomic weapons.
+
+Who discovered penicillin? | Alexander Fleming
+
+What is the difference between weather and climate? | Weather refers to short-term atmospheric conditions in a specific place at a specific time, including temperature, humidity, precipitation, cloudiness, visibility, and wind. Climate, on the other hand, refers to the long-term average of weather patterns over a significant period of time (typically 30 years or more) in a particular region. Weather is what you experience day-to-day, while climate is what you expect based on long-term averages and patterns.
+
+Define entropy | In thermodynamics, entropy is a measure of the number of specific ways in which a system may be arranged, often taken to be a measure of disorder, or a measure of progressing towards thermodynamic equilibrium. The second law of thermodynamics states that the total entropy of an isolated system can never decrease over time.
