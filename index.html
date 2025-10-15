@@ -719,22 +719,27 @@
             </div>
         </div>
 
-        <div class="upload-section" id="uploadSection">
-            <h2>📚 Load Your Flashcards</h2>
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">📁</div>
-                <p style="font-size: 1.3em; font-weight: 600; margin-bottom: 8px;">Click or drag to upload</p>
-                <p style="color: #9ca3af; font-weight: 500;">Supports .txt, .docx, and .json files</p>
-                <input type="file" id="fileInput" accept=".txt,.docx,.json">
+        <div class="upload-section" id="deckSelector">
+            <h2>📚 Choose Your Flashcard Deck</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div onclick="loadDeck('modmed')" style="cursor: pointer; background: linear-gradient(135deg, #4A90E2 0%, #5E7CE2 100%); padding: 30px; border-radius: 20px; color: white; text-align: center; transition: all 0.3s; box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 3em; margin-bottom: 15px;">💼</div>
+                    <h3 style="font-size: 1.5em; margin-bottom: 10px;">ModMed Sales</h3>
+                    <p style="opacity: 0.9; font-size: 0.95em;">102 cards covering pain points, impacts, and solutions</p>
+                </div>
+                <div onclick="loadDeck('sheldon')" style="cursor: pointer; background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%); padding: 30px; border-radius: 20px; color: white; text-align: center; transition: all 0.3s; box-shadow: 0 8px 20px rgba(155, 89, 182, 0.3);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 3em; margin-bottom: 15px;">🔍</div>
+                    <h3 style="font-size: 1.5em; margin-bottom: 10px;">Sheldon String Theory</h3>
+                    <p style="opacity: 0.9; font-size: 0.95em;">Discovery approach with CONFIRM, SUGGEST, OPEN, SOLUTION</p>
+                </div>
             </div>
-            <div class="format-help">
-                <strong>💡 Text File Format:</strong><br>
-                Each flashcard should be on a new line, with the question and answer separated by a pipe <code>|</code><br><br>
-                <strong>Example:</strong><br>
-                <code>What is the capital of France? | Paris</code><br>
-                <code>2 + 2 = ? | 4</code><br><br>
-                <strong>JSON Format:</strong><br>
-                <code>[{"question": "What is...?", "answer": "..."}, ...]</code>
+            <div style="text-align: center; padding: 20px; background: #F0F4F8; border-radius: 16px; border: 2px dashed #4A90E2;">
+                <p style="font-size: 1.1em; color: #4A90E2; font-weight: 600; margin-bottom: 10px;">📁 Or Upload Your Own Deck</p>
+                <div class="upload-area" id="uploadArea" style="border: none; padding: 20px; background: white; border-radius: 12px;">
+                    <p style="font-size: 1em; margin-bottom: 8px;">Click or drag to upload</p>
+                    <p style="color: #9ca3af; font-weight: 500; font-size: 0.9em;">Supports .txt, .docx, and .json files</p>
+                    <input type="file" id="fileInput" accept=".txt,.docx,.json">
+                </div>
             </div>
         </div>
 
@@ -745,7 +750,8 @@
                 <button class="mode-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="setMode('manage')">⚙️ Manage Cards</button>
             </div>
             
-            <div style="text-align: center; margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 20px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="nav-btn" onclick="changeDeck()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🔄 Change Deck</button>
                 <button class="nav-btn" onclick="downloadDeck()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">📥 Download Deck</button>
             </div>
 
@@ -825,6 +831,30 @@
         let currentStreak = 0;
         let usedIndices = new Set();
 
+        // Pre-loaded flashcard decks
+        const DECKS = {
+            modmed: null, // Will be loaded from file
+            sheldon: null // Will be loaded from file
+        };
+
+        // Load deck function
+        async function loadDeck(deckName) {
+            try {
+                let response;
+                if (deckName === 'modmed') {
+                    response = await fetch('modmed-sales-flashcards.txt');
+                } else if (deckName === 'sheldon') {
+                    response = await fetch('sheldon-string-theory.txt');
+                }
+                
+                const text = await response.text();
+                parseTextFile(text);
+            } catch (error) {
+                console.error('Error loading deck:', error);
+                alert('Error loading flashcards. Please try uploading a file instead.');
+            }
+        }
+
         // File upload handling
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -897,7 +927,7 @@
         }
 
         function startStudying() {
-            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('deckSelector').style.display = 'none';
             document.getElementById('cardSection').classList.add('active');
             document.getElementById('statsBar').style.display = 'grid';
             updateStats();
@@ -1178,7 +1208,23 @@
             updateStats();
         }
 
-        // Card Management Functions
+        // Deck Management Functions
+        function changeDeck() {
+            // Reset everything
+            flashcards = [];
+            currentIndex = 0;
+            studiedCards = new Set();
+            usedIndices = new Set();
+            quizScore = 0;
+            quizAnswered = 0;
+            currentStreak = 0;
+            
+            // Show deck selector
+            document.getElementById('cardSection').classList.remove('active');
+            document.getElementById('statsBar').style.display = 'none';
+            document.getElementById('deckSelector').style.display = 'block';
+        }
+
         function downloadDeck() {
             if (flashcards.length === 0) {
                 alert('No cards to download! Please upload a deck first.');
