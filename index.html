@@ -273,7 +273,7 @@
         .flashcard {
             perspective: 1500px;
             margin: 40px auto;
-            max-width: 800px;
+            max-width: 850px;
             width: 100%;
         }
 
@@ -284,6 +284,10 @@
             transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             cursor: pointer;
+        }
+
+        .flashcard-inner.string-theory {
+            min-height: 600px;
         }
 
         .flashcard-inner.flipped {
@@ -699,6 +703,21 @@
                 font-size: 0.8em;
                 padding: 18px 20px;
             }
+
+            .flashcard {
+                max-width: 100%;
+                margin: 30px auto;
+            }
+
+            .flashcard-inner.string-theory {
+                min-height: 500px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .flashcard-back {
+                padding: 20px 15px !important;
+            }
         }
     </style>
 </head>
@@ -734,12 +753,12 @@
                 <div onclick="loadDeck('modmed')" style="cursor: pointer; background: linear-gradient(135deg, #4A90E2 0%, #5E7CE2 100%); padding: 30px; border-radius: 20px; color: white; text-align: center; transition: all 0.3s; box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                     <div style="font-size: 3em; margin-bottom: 15px;">💼</div>
                     <h3 style="font-size: 1.5em; margin-bottom: 10px;">ModMed Sales</h3>
-                    <p style="opacity: 0.9; font-size: 0.95em;">102 cards covering pain points, impacts, and solutions</p>
+                    <p style="opacity: 0.9; font-size: 0.95em;">105 cards covering pain points, impacts, and solutions</p>
                 </div>
                 <div onclick="loadDeck('sheldon')" style="cursor: pointer; background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%); padding: 30px; border-radius: 20px; color: white; text-align: center; transition: all 0.3s; box-shadow: 0 8px 20px rgba(155, 89, 182, 0.3);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                     <div style="font-size: 3em; margin-bottom: 15px;">🔍</div>
                     <h3 style="font-size: 1.5em; margin-bottom: 10px;">Sheldon String Theory</h3>
-                    <p style="opacity: 0.9; font-size: 0.95em;">Discovery approach with CONFIRM, SUGGEST, OPEN, SOLUTION</p>
+                    <p style="opacity: 0.9; font-size: 0.95em;">60 discovery cards with 4-step methodology</p>
                 </div>
             </div>
             <div style="text-align: center; padding: 20px; background: #F0F4F8; border-radius: 16px; border: 2px dashed #4A90E2;">
@@ -957,20 +976,43 @@
             if (card.answer.includes('Step 1') && card.answer.includes('→')) {
                 const steps = card.answer.split('→').map(s => s.trim());
                 
-                let html = '<div style="display: flex; flex-direction: column; gap: 20px; width: 100%; text-align: left;">';
+                const stepTitles = [
+                    { title: 'CONFIRM', subtitle: 'Show you\'re listening - restate their driver' },
+                    { title: 'SUGGEST IMPACTS', subtitle: 'Educate on Pain, Business Impact, Root Cause' },
+                    { title: 'OPEN THE FLOOR', subtitle: 'Ask powerful discovery question to quantify' },
+                    { title: 'SOLUTION', subtitle: 'Share specific ModMed capability with proof' }
+                ];
+                const colors = ['#4A90E2', '#9B59B6', '#10B981', '#F59E0B'];
+                
+                let html = '<div style="display: flex; flex-direction: column; gap: 16px; width: 100%; text-align: left; padding: 5px;">';
                 
                 steps.forEach((step, idx) => {
-                    const stepNum = idx + 1;
-                    const colors = ['#4A90E2', '#9B59B6', '#10B981', '#F59E0B'];
+                    const stepInfo = stepTitles[idx] || { title: `Step ${idx + 1}`, subtitle: '' };
                     const color = colors[idx % 4];
                     
+                    // Extract content after the step label
+                    let content = step;
+                    if (step.includes(':')) {
+                        content = step.split(':').slice(1).join(':').trim();
+                    }
+                    
                     html += `
-                        <div style="background: rgba(255,255,255,0.95); border-left: 4px solid ${color}; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            <div style="color: ${color}; font-weight: 700; font-size: 0.9em; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                                ${step.includes('Step') ? step.split(':')[0].split('-')[0].trim() : 'Step ' + stepNum}
+                        <div style="background: rgba(255,255,255,0.98); border-left: 5px solid ${color}; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <div style="background: ${color}; color: white; padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.75em; margin-right: 10px; letter-spacing: 0.5px;">
+                                    ${idx + 1}
+                                </div>
+                                <div>
+                                    <div style="color: ${color}; font-weight: 700; font-size: 0.95em; line-height: 1.2;">
+                                        ${stepInfo.title}
+                                    </div>
+                                    <div style="color: #6B7280; font-size: 0.7em; font-weight: 500; line-height: 1.3; margin-top: 2px;">
+                                        ${stepInfo.subtitle}
+                                    </div>
+                                </div>
                             </div>
-                            <div style="color: #2C3E50; font-size: 1em; line-height: 1.6; font-weight: 500;">
-                                ${step.includes(':') ? step.split(':').slice(1).join(':').trim() : step}
+                            <div style="color: #1F2937; font-size: 0.95em; line-height: 1.7; font-weight: 500;">
+                                ${content}
                             </div>
                         </div>
                     `;
@@ -987,14 +1029,27 @@
             // Dynamic font sizing for question
             applyDynamicFontSize(questionEl, card.question);
             
-            // Adjust card height
+            // Adjust card height for String Theory cards
             const flashcardFront = document.querySelector('.flashcard-front');
             const flashcardBack = document.querySelector('.flashcard-back');
-            flashcardBack.style.minHeight = '500px';
-            flashcardBack.style.maxHeight = '700px';
+            
+            const flashcardInner = document.getElementById('flashcardInner');
+            
+            if (card.answer.includes('Step 1') && card.answer.includes('→')) {
+                // String Theory cards need more height
+                flashcardBack.style.minHeight = '600px';
+                flashcardBack.style.maxHeight = '800px';
+                flashcardBack.style.overflowY = 'auto';
+                flashcardInner.classList.add('string-theory');
+            } else {
+                // Regular cards
+                flashcardBack.style.minHeight = '350px';
+                flashcardBack.style.maxHeight = '600px';
+                flashcardInner.classList.remove('string-theory');
+            }
             
             // Reset flip
-            document.getElementById('flashcardInner').classList.remove('flipped');
+            flashcardInner.classList.remove('flipped');
             
             studiedCards.add(currentIndex);
             updateStats();
